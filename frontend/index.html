@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оценка риска диабета</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🩺 Оценка риска диабета</h1>
+            <p>Заполните анкету для анализа индивидуальных факторов риска</p>
+        </header>
+
+        <form id="predictionForm">
+            <div class="form-grid">
+                <!-- Генерализованное здоровье (1-5) -->
+                <div class="form-group">
+                    <label for="GenHlth">Общее состояние здоровья:</label>
+                    <select id="GenHlth" required>
+                        <option value="1">1 - Отличное</option>
+                        <option value="2">2 - Очень хорошее</option>
+                        <option value="3" selected>3 - Хорошее</option>
+                        <option value="4">4 - Удовлетворительное</option>
+                        <option value="5">5 - Плохое</option>
+                    </select>
+                </div>
+
+                <!-- Возраст (1-13) -->
+                <div class="form-group">
+                    <label for="Age">Возрастная группа:</label>
+                    <select id="Age" required>
+                        <option value="1">18-24</option>
+                        <option value="2">25-29</option>
+                        <option value="3">30-34</option>
+                        <option value="4">35-39</option>
+                        <option value="5">40-44</option>
+                        <option value="6">45-49</option>
+                        <option value="7">50-54</option>
+                        <option value="8">55-59</option>
+                        <option value="9" selected>60-64</option>
+                        <option value="10">65-69</option>
+                        <option value="11">70-74</option>
+                        <option value="12">75-79</option>
+                        <option value="13">≥80</option>
+                    </select>
+                </div>
+
+                <!-- ИМТ (число) -->
+                <div class="form-group">
+                    <label for="BMI">Индекс массы тела (ИМТ):</label>
+                    <input type="number" id="BMI" step="0.1" min="10" max="60" placeholder="Например, 24.5" required>
+                </div>
+
+                <!-- Бинарные признаки (0/1) -->
+                <div class="form-group">
+                    <label for="HighBP">Высокое давление:</label>
+                    <select id="HighBP">
+                        <option value="0">Нет</option>
+                        <option value="1">Да</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="HeartDiseaseorAttack">Болезни сердца:</label>
+                    <select id="HeartDiseaseorAttack">
+                        <option value="0">Нет</option>
+                        <option value="1">Да</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="DiffWalk">Трудности при ходьбе:</label>
+                    <select id="DiffWalk">
+                        <option value="0">Нет</option>
+                        <option value="1">Да</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="PhysActivity">Физ. активность:</label>
+                    <select id="PhysActivity">
+                        <option value="1">Да</option>
+                        <option value="0">Нет</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">Рассчитать риск</button>
+        </form>
+
+        <div id="result" class="result-box hidden">
+            <h3>Результат анализа</h3>
+            <div class="risk-score">
+                <span id="riskLevel"></span>
+                <span id="riskPercent"></span>
+            </div>
+            <div class="top-factors">
+                <strong>Ключевые факторы:</strong>
+                <ul id="factorsList"></ul>
+            </div>
+            <p id="loading" class="loading hidden">Обработка данных...</p>
+            <p id="error" class="error hidden">Произошла ошибка при соединении с сервером.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
