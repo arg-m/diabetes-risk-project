@@ -2,13 +2,14 @@
 FastAPI Backend для предсказания риска диабета.
 Загружает обученный Pipeline + модель, валидирует входные данные, возвращает интерпретируемый результат.
 """
-from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 from .schemas import DiabetesInput, DiabetesResponse
@@ -106,4 +107,10 @@ def health_check():
     }
 
 frontend_dir = Path(__file__).parent.parent.parent / "frontend"
-app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+
+@app.get("/app")
+async def serve_frontend():
+    return FileResponse(frontend_dir / "index.html")
+
+# Статика (CSS, JS)
+app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
