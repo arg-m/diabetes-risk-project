@@ -54,7 +54,7 @@ def get_model_params(model_name):
 
 def train_and_evaluate(X_train, X_test, y_train, y_test, model_name, preprocessor):
     """Обучение модели с GridSearchCV и оценка метрик."""
-    print(f"\n🔄 Обучение {model_name.upper()}...")
+    print(f"\nОбучение {model_name.upper()}...")
     
     model, param_grid = get_model_params(model_name)
     
@@ -83,7 +83,7 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, model_name, preprocesso
         'roc_auc': roc_auc_score(y_test, y_pred_proba)
     }
     
-    print("📊 Метрики на test:")
+    print("Метрики на test:")
     for name, value in metrics.items():
         print(f"  {name:10s}: {value:.4f}")
     
@@ -107,7 +107,7 @@ def plot_confusion_matrix(cm, model_name, save_path=None):
     plt.tight_layout()
     if save_path:
         plt.savefig(save_path, dpi=300)
-        print(f"💾 Матрица ошибок сохранена: {save_path}")
+        print(f"Матрица ошибок сохранена: {save_path}")
     plt.show()
 
 
@@ -127,7 +127,7 @@ def plot_roc_curve(y_test, y_pred_proba, model_name, save_path=None):
     plt.tight_layout()
     if save_path:
         plt.savefig(save_path, dpi=300)
-        print(f"💾 ROC-кривая сохранена: {save_path}")
+        print(f"ROC-кривая сохранена: {save_path}")
     plt.show()
 
 
@@ -167,7 +167,7 @@ def save_best_model(pipeline, model, metrics, model_name, output_path):
         'feature_labels': FEATURE_LABELS
     }
     joblib.dump(package, output_path)
-    print(f"💾 Модель сохранена: {output_path}")
+    print(f"Модель сохранена: {output_path}")
 
 
 def main():
@@ -175,7 +175,7 @@ def main():
     from preprocessing import prepare_data
     
     # Загрузка и предобработка
-    print("🔄 Загрузка данных...")
+    print("Загрузка данных...")
     X_train_proc, X_test_proc, y_train, y_test, preprocessor = prepare_data()
     
     # Обучение моделей
@@ -197,7 +197,7 @@ def main():
         
         # Интерпретация
         importance = get_feature_importance(model, model_name)
-        print(f"\n📊 Важность признаков ({model_name}):")
+        print(f"\nВажность признаков ({model_name}):")
         print(importance[['label', 'coef' if 'coef' in importance.columns else 'importance']].head(7).to_string(index=False))
         
         results[model_name] = {
@@ -209,7 +209,7 @@ def main():
     
     # Выбор лучшей модели по ROC-AUC
     best_name = max(results, key=lambda x: results[x]['metrics']['roc_auc'])
-    print(f"\n🏆 Лучшая модель: {best_name.upper()} (ROC-AUC: {results[best_name]['metrics']['roc_auc']:.4f})")
+    print(f"\nЛучшая модель: {best_name.upper()} (ROC-AUC: {results[best_name]['metrics']['roc_auc']:.4f})")
     
     # Сохранение
     save_best_model(

@@ -70,8 +70,7 @@ def plot_odds_ratio(model, save_path=None):
 
 
 def print_interpretation_report(model, model_name):
-    """Текстовый отчёт для курсовой работы."""
-    print(f"\n📋 ИНТЕРПРЕТАЦИЯ МОДЕЛИ: {model_name.upper()}")
+    print(f"\nИНТЕРПРЕТАЦИЯ МОДЕЛИ: {model_name.upper()}")
     print("=" * 60)
     
     if model_name == 'logistic':

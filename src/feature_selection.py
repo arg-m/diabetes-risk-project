@@ -28,9 +28,8 @@ def calculate_mi_scores():
     return scores
 
 def print_selection_report():
-    """Выводит академически оформленный отчёт для курсовой."""
     scores = calculate_mi_scores()
-    print("📊 === Отчёт по отбору признаков ===")
+    print("=== Отчёт по отбору признаков ===")
     print("Метод: Mutual Information Classification (учитывает нелинейные зависимости)")
     print("Отобрано 7 признаков на основе EDA, MI и клинической значимости:\n")
     

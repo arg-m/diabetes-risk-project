@@ -15,7 +15,6 @@ from contextlib import asynccontextmanager
 from .schemas import DiabetesInput, DiabetesResponse
 from ..config import BASE_DIR, MODEL_FILENAME, FEATURE_LABELS, SELECTED_FEATURES
 
-# Глобальный контейнер для модели
 model_package = None
 
 @asynccontextmanager
@@ -25,14 +24,14 @@ async def lifespan(app: FastAPI):
     model_path = BASE_DIR / "models" / MODEL_FILENAME
     
     if not model_path.exists():
-        raise FileNotFoundError(f"❌ Модель не найдена: {model_path}\nСначала выполните обучение (Шаг 3).")
+        raise FileNotFoundError(f"Модель не найдена: {model_path}\nСначала выполните обучение (Шаг 3).")
         
     model_package = joblib.load(model_path)
-    print(f"✅ Модель успешно загружена: {model_package['model_name']} | Версия: {model_package['metrics']['roc_auc']:.3f} ROC-AUC")
+    print(f"Модель успешно загружена: {model_package['model_name']} | Версия: {model_package['metrics']['roc_auc']:.3f} ROC-AUC")
     
     yield
     
-    print("👋 Приложение завершает работу. Модель выгружена из памяти.")
+    print("Приложение завершает работу. Модель выгружена из памяти.")
 
 app = FastAPI(
     title="Diabetes Risk API",
@@ -44,7 +43,7 @@ app = FastAPI(
 # Разрешаем CORS для фронтенда
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # В продакшене замените на конкретный домен
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -112,5 +111,4 @@ frontend_dir = Path(__file__).parent.parent.parent / "frontend"
 async def serve_frontend():
     return FileResponse(frontend_dir / "index.html")
 
-# Статика (CSS, JS)
 app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
