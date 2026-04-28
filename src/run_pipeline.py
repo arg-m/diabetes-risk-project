@@ -1,47 +1,62 @@
-#!/usr/bin/env python3
 """
-Оркестратор проекта: последовательный запуск предобработки, отбора признаков, обучения и интерпретации.
-Запуск: python run_pipeline.py
-"""
-import sys
-from pathlib import Path
-sys.path.append(str(Path("src")))
+Главный оркестратор ML-пайплайна проекта прогнозирования диабета.
 
-from preprocessing import prepare_data
-from feature_selection import calculate_mi_scores
-from modeling import train_and_evaluate, save_best_model, get_feature_importance
-from interpretation import print_interpretation_report
-from config import MODELS_DIR, MODEL_FILENAME, SELECTED_FEATURES
+Последовательно выполняет:
+1. загрузку и подготовку данных
+2. анализ значимости признаков
+3. обучение нескольких моделей
+4. сравнение моделей по ROC-AUC
+5. интерпретацию лучшей модели
+
+Является точкой входа для полного ML-процесса.
+"""
+
+from preprocessing import load_data, build_preprocessor, split_data
+from feature_selection import calculate_mi_scores, print_mi_report
+from modeling import train_and_evaluate, save_best_model
+
 
 def main():
-    print("Шаг 1: Загрузка и предобработка данных...")
-    X_train, X_test, y_train, y_test, preprocessor = prepare_data()
-    print(f"Train: {X_train.shape}, Test: {X_test.shape}\n")
+    df = load_data()
+    X_train, X_test, y_train, y_test = split_data(df)
 
-    print("Шаг 2: Отбор признаков (Mutual Information)...")
-    mi_df = calculate_mi_scores()
-    print(mi_df.to_string(index=False))
-    print()
+    mi = calculate_mi_scores(X_train, y_train)
+    print_mi_report(mi)
 
-    print("Шаг 3: Обучение моделей (LogisticRegression + DecisionTree)...")
+    preprocessor = build_preprocessor()
+
+    X_train_proc = preprocessor.fit_transform(X_train)
+    X_test_proc = preprocessor.transform(X_test)
+
     results = {}
-    for model_name in ['logistic', 'tree']:
-        print(f"\n Обучение {model_name.upper()}")
-        model, metrics, cm, y_pred_proba, _ = train_and_evaluate(
-            X_train, X_test, y_train, y_test, model_name, preprocessor
+
+    for model_name in ["logistic", "tree", "rf"]:
+        print(f"\nОбучение модели: {model_name}")
+
+        model, metrics, y_proba = train_and_evaluate(
+            X_train_proc, X_test_proc, y_train, y_test, model_name
         )
-        results[model_name] = {'model': model, 'metrics': metrics, 'y_pred_proba': y_pred_proba}
-        print(f"   ROC-AUC: {metrics['roc_auc']:.4f}")
 
-    best_name = max(results, key=lambda x: results[x]['metrics']['roc_auc'])
-    print(f"\n Лучшая модель: {best_name.upper()}")
+        results[model_name] = {"model": model, "metrics": metrics}
 
-    print(" Шаг 4: Сохранение пайплайна и модели...")
-    save_best_model(preprocessor, results[best_name]['model'], results[best_name]['metrics'], best_name, MODELS_DIR / MODEL_FILENAME)
+        print(f"ROC-AUC: {metrics['roc_auc']:.4f}")
 
-    print("\n Шаг 5: Интерпретация...")
-    print_interpretation_report(results[best_name]['model'], best_name)
-    print("\n Пайплайн завершён. Модель сохранена в models/, графики готовы для отчёта.")
+    best_name = max(results, key=lambda x: results[x]["metrics"]["roc_auc"])
+
+    best_model = results[best_name]["model"]
+    best_metrics = results[best_name]["metrics"]
+
+    print(f"\nЛучшая модель: {best_name.upper()}")
+
+    save_best_model(
+        model=best_model,
+        preprocessor=preprocessor,
+        metrics=best_metrics,
+        model_name=best_name,
+    )
+
+    print("\nPipeline завершён успешно.")
+
 
 if __name__ == "__main__":
     main()
